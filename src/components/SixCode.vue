@@ -60,7 +60,7 @@ export default {
   data () {
     return {
       items: sixSymbols,
-      seriesCode: '159026',
+      seriesCode: '',
       result: '',
       selectSymbol: ''
     }
