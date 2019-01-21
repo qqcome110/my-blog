@@ -21,7 +21,7 @@
       </span>
     </div>
     <div class="form-group">
-      <label for="">结果：</label>
+      <label for="">结果：({{ results.length }}个)<button type="button" @click="reset">重置</button></label>
       <div class="result">
         <ul>
           <li v-for="r in results" :key="r.code" :class="{
@@ -145,6 +145,12 @@ export default {
       const matched = colorCodes.find(cc => cc.codes.includes(code))
 
       return matched ? matched.color : ''
+    },
+
+    reset () {
+      this.codeColor = 0
+      this.oddEvenNumber = 1
+      this.selectedSymbols = []
     }
   }
 }
