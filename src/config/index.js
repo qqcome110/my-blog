@@ -95,3 +95,7 @@ export const oddEven = [
   { id: ODD, name: '单数' },
   { id: EVEN, name: '双数' }
 ]
+// 两合
+// export const twiceProp = {
+//   '1': 
+// }
