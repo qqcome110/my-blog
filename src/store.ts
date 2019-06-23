@@ -14,7 +14,7 @@ export default new Vuex.Store({
     },
 
     removeCode (state, code) {
-      const matchedIndex = state.codes.findIndex(c => c.code === code.code)
+      const matchedIndex = state.codes.findIndex((c: any) => c.code === code.code)
 
       state.codes.splice(matchedIndex, 1)
     },
