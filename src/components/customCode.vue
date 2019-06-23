@@ -21,21 +21,33 @@
       </el-checkbox-group>
     </div>
     <div class="form-group mt10">
-      <label for="">准一尾：</label>
+      <label for="">
+        <el-select class="stratTail" v-model="stratTail" placeholder="请选择">
+          <el-option label="准一尾" value="correct"></el-option>
+          <el-option label="杀一尾" value="disCorrect"></el-option>
+        </el-select>
+        :
+      </label>
       <el-select v-model="numTails" multiple placeholder="请选择">
         <el-option
-          v-for="(n, i) in 10"
-          :key="i"
-          :label="i"
-          :value="i">
+          v-for="n in singleNums"
+          :key="n"
+          :label="n"
+          :value="n">
         </el-option>
       </el-select>
     </div>
     <div class="form-group mt10">
-      <label for="">杀一头：</label>
+      <label for="">
+        <el-select class="stratTail" v-model="stratHead" placeholder="请选择">
+          <el-option label="准一头" value="correct"></el-option>
+          <el-option label="杀一头" value="disCorrect"></el-option>
+        </el-select>
+        :
+      </label>
       <el-select v-model="numHeads" multiple placeholder="请选择">
         <el-option
-          v-for="(n, i) in 10"
+          v-for="(n, i) in 5"
           :key="i"
           :label="i"
           :value="i">
@@ -48,91 +60,19 @@
         <el-badge :value="`${results.length}个`" class="result-tag">
           <el-button size="small" @click="reset">重置</el-button>
         </el-badge>
+        <el-badge :value="`${results.length}个`" class="result-tag">
+          <el-button size="small" @click="save">存储</el-button>
+        </el-badge>
       </div>
-      <div class="result">
-        <ul>
-          <li v-for="r in results" :key="r.code" :class="{
-              [`code-${getCodeColor(r.code)}`]: true,
-              'code-layout': true
-            }">
-            <span>{{ r.code }}</span>
-            <span>{{ r.symbol }}</span>
-          </li>
-        </ul>
-      </div>
+      <code-list :codes="results"></code-list>
     </div>
   </div>
 </template>
 
-<style lang="scss" scoped>
-@mixin gen () {
-  $opcity: .9;
-  $selector: code;
-  $colors: blue green red;
-
-  %base {
-    color: #fff;
-    width: 40px;
-    height: 40px;  
-    font-weight: 700;
-    border-radius: 50%;
-    padding: 5px;
-    appearance: none;
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
-  }
-
-  @each $color in $colors {
-    .#{$selector}-#{$color} {
-      @extend %base;
-      background-color: rgba($color, $opcity);
-    }
-  }
-}
-
-.mt10 {
-  margin-top: 10px;
-}
-
-.result {
-  margin-top: 10px;
-
-  ul {
-    display: flex;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    flex-flow: row wrap;
-    justify-content: space-evenly;
-
-    li {
-      margin-bottom: 10px;
-    }
-  }
-
-  .code-layout {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-}
-
-.inline-group {
-  display: inline-block;
-}
-
-.result-wrapper {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-@include gen();
-</style>
-
-
 <script>
-import { colorCodes, oddEven, symbols, ODD, sixCodeMap, symbolCodes } from '../config'
+import { colorCodes, oddEven, symbols, ODD, IGNORE, sixCodeMap, symbolCodes, EVEN } from '../config'
+import Store from '../store'
+import CodeList from '@/components/CodeList'
 
 export default {
   name: 'CustomCode',
@@ -153,15 +93,25 @@ export default {
       checkSymbolAll: false,
 
       // 一尾
+      stratTail: 'correct',
       numTails: [],
       // 一头
+      stratHead: 'correct',
       numHeads: []
     }
+  },
+
+  components: {
+    CodeList,
   },
 
   computed: {
     results () {
       return this.calcCode()
+    },
+
+    hasResults () {
+      return this.results && this.results.length
     },
 
     isIndeterminate () {
@@ -174,6 +124,22 @@ export default {
       const { selectedSymbols, symbols } = this
 
       return selectedSymbols ? selectedSymbols.length > 0 && selectedSymbols.length !== symbols.length : false
+    },
+
+    singleNums () {
+      const nums = Array.from({ length: 10 }, (_, index) => index)
+
+      switch (this.oddEvenNumber) {
+        case ODD:
+          return nums.filter(n => n % 2 !== 0)
+          break
+        case EVEN:
+          return nums.filter(n => n % 2 === 0)
+          break
+        case IGNORE:
+          return nums
+          break
+      }
     }
   },
 
@@ -194,6 +160,17 @@ export default {
       this.checkSymbolAll = val.length === this.symbols.length
     },
 
+    save () {
+      if (this.hasResults) {
+        Store.commit('setCodes', this.results)
+        // this.$message({
+        //   message: '存储成功！请查看Store',
+        //   type: 'success',
+        //   showClose: true
+        // });
+      }
+    },
+
     calcCode () {
       const { selectedColorCodes, oddEvenNumber, selectedSymbols, numTails, numHeads} = this
 
@@ -201,6 +178,8 @@ export default {
       const resultColorCodes = colorCodes.filter(c => selectedColorCodes.includes(c.id))
       // 单?
       const isOdd = oddEvenNumber === ODD
+      // 不限单双
+      const isIgnore = oddEvenNumber === IGNORE
       // 生肖号码
       const resultCodes = selectedSymbols.reduce((arr, symbol) => {
         const _symbol = symbols.find(s => s.id === symbol)
@@ -216,20 +195,34 @@ export default {
       // 过滤波色
       const filterColorCodes = resultCodes.filter(rc => resultColorCodes.find(rcc => rcc.codes.includes(rc)))
       // 过滤单双数
-      const filterOddEvenCodes = filterColorCodes.filter(fcc => {
+      const filterOddEvenCodes = isIgnore ? filterColorCodes : filterColorCodes.filter(fcc => {
         const remain = isOdd ? 1 : 0
         return +fcc % 2 === remain
       })
-      // 准一尾
-      const filterTailCodes = filterOddEvenCodes.filter(n => {
-        const [, tailNum] = n.split('')
-        return numTails && numTails.length ? numTails.includes(+tailNum) : true
-      })
+      // 准一尾 / 杀一尾
+      const stratTailFnMap = {
+        correct: (n) => {
+          const [, tailNum] = n.split('')
+          return numTails && numTails.length ? numTails.includes(+tailNum) : true
+        },
+        disCorrect: (n) => {
+          const [, tailNum] = n.split('')
+          return numTails && numTails.length ? !numTails.includes(+tailNum) : true
+        }
+      }
+      const filterTailCodes = filterOddEvenCodes.filter(stratTailFnMap[this.stratTail])
       // 杀一头
-      const filterHeadCodes = filterTailCodes.filter(n => {
-        const [headNum, ] = n.split('')
-        return numHeads && numHeads.length ? !numHeads.includes(+headNum) : true
-      })
+      const startHeadFnMap = {
+        correct: (n) => {
+          const [headNum, ] = n.split('')
+          return numHeads && numHeads.length ? numHeads.includes(+headNum) : true
+        },
+        disCorrect: (n) => {
+          const [headNum, ] = n.split('')
+          return numHeads && numHeads.length ? !numHeads.includes(+headNum) : true
+        }
+      }
+      const filterHeadCodes = filterTailCodes.filter(startHeadFnMap[this.stratHead])
       // 填充生肖
       const codeMapSymbol = filterHeadCodes.map(c => symbolCodes.find(sc => sc.code === c))
 
@@ -254,3 +247,31 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.mt10 {
+  margin-top: 10px;
+}
+
+.result-tag {
+  & + & {
+    margin-left: 30px;
+  }
+}
+
+.inline-group {
+  display: inline-block;
+}
+
+.stratTail {
+  display: inline-block;
+  width: 100px;
+}
+
+.result-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+}
+</style>

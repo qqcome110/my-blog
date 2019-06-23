@@ -90,10 +90,12 @@ export const colorCodes = [
 
 export const ODD = 1
 export const EVEN = 2
+export const IGNORE = 3
 
 export const oddEven = [
   { id: ODD, name: '单数' },
-  { id: EVEN, name: '双数' }
+  { id: EVEN, name: '双数' },
+  { id: IGNORE, name: '不限' }
 ]
 // 两合
 // export const twiceProp = {
