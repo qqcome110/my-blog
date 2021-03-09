@@ -1,41 +1,34 @@
 {
-  "name": "demo-for-ui-create",
-  "version": "0.1.0",
-  "private": true,
+  "name": "Learn-Vue-Source-Code",
+  "version": "1.0.0",
+  "description": "",
+  "directories": {
+    "doc": "doc"
+  },
   "scripts": {
-    "boot": "yarn",
-    "preserve": "yarn boot",
-    "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
-    "test:unit": "vue-cli-service test:unit"
+    "dev": "vuepress dev docs",
+    "build": "vuepress build docs",
+    "commit": "git cz",
+    "deploy": "sh deploy.sh"
   },
-  "dependencies": {
-    "element-ui": "^2.5.1",
-    "register-service-worker": "^1.0.0",
-    "vue": "^2.5.16",
-    "vue-class-component": "^6.0.0",
-    "vue-property-decorator": "^6.0.0",
-    "vue-router": "^3.0.1",
-    "vuex": "^3.0.1",
-    "vuex-persistedstate": "^2.5.4"
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lenqwang/my-blog.git"
   },
+  "keywords": [],
+  "author": "NLRX",
+  "license": "MIT",
   "devDependencies": {
-    "@types/jest": "^22.0.1",
-    "@vue/cli-plugin-babel": "^3.0.0-rc.3",
-    "@vue/cli-plugin-pwa": "^3.0.0-rc.3",
-    "@vue/cli-plugin-typescript": "^3.0.0-rc.3",
-    "@vue/cli-plugin-unit-jest": "^3.0.0-rc.3",
-    "@vue/cli-service": "^3.0.0-rc.3",
-    "@vue/test-utils": "^1.0.0-beta.16",
-    "babel-core": "7.0.0-bridge.0",
-    "node-sass": "^4.9.0",
-    "sass-loader": "^7.0.1",
-    "ts-jest": "^22.4.6",
-    "vue-template-compiler": "^2.5.16"
+    "@vuepress/plugin-back-to-top": "^1.2.0",
+    "@vuepress/plugin-pwa": "^1.2.0",
+    "commitizen": "^4.0.3",
+    "cz-conventional-changelog": "^3.0.2",
+    "vuepress": "^1.2.0",
+    "vuepress-plugin-medium-zoom": "^1.1.8"
   },
-  "browserslist": [
-    "> 1%",
-    "last 2 versions",
-    "not ie <= 8"
-  ]
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
 }
